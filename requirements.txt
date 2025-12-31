@@ -4,3 +4,4 @@ numpy
 plotly
 openpyxl
 scikit-learn
+prophet>=1.1
