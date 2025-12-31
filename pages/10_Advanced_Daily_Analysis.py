@@ -5,13 +5,13 @@ import plotly.express as px
 from prophet import Prophet
 
 st.set_page_config(page_title="Advanced Daily Sales Analysis", layout="wide")
-st.title("📊 Advanced Daily Sales Analysis")
+st.title("Advanced Daily Sales Analysis")
 
 # ---------------------------
 # Load data
 # ---------------------------
 if "data" not in st.session_state or st.session_state["data"] is None:
-    st.warning("⚠ Please upload data from the Upload Dataset page")
+    st.warning(" Please upload data from the Upload Dataset page")
     st.stop()
 
 df = st.session_state["data"].copy()
@@ -26,7 +26,7 @@ required_cols = [
 
 missing_cols = [c for c in required_cols if c not in df.columns]
 if missing_cols:
-    st.error(f"❌ Missing required columns: {missing_cols}")
+    st.error(f" Missing required columns: {missing_cols}")
     st.stop()
 
 # ---------------------------
@@ -38,7 +38,7 @@ df = df.dropna(subset=["ORDER_DATE"])
 # ---------------------------
 # Sidebar filters
 # ---------------------------
-st.sidebar.header("🔎 Filters")
+st.sidebar.header(" Filters")
 min_date = df["ORDER_DATE"].min().date()
 max_date = df["ORDER_DATE"].max().date()
 date_range = st.sidebar.date_input("Select Date Range", value=(min_date, max_date), min_value=min_date, max_value=max_date)
@@ -73,7 +73,7 @@ daily_sales.rename(columns={"ORDER_DATE": "Date"}, inplace=True)
 # ---------------------------
 # Step 1: Week-on-Week & Month-on-Month Growth
 # ---------------------------
-st.subheader("1️⃣ Week-on-Week & Month-on-Month Growth")
+st.subheader("1 Week-on-Week & Month-on-Month Growth")
 
 daily_sales["Week"] = pd.to_datetime(daily_sales["Date"]).dt.isocalendar().week
 daily_sales["Month"] = pd.to_datetime(daily_sales["Date"]).dt.to_period("M")
@@ -88,7 +88,7 @@ k2.metric("Month-on-Month Growth %", f"{monthly_sales.iloc[-1]:.2f}%")
 # ---------------------------
 # Step 2: Top 5 Cities / Warehouses / Brands
 # ---------------------------
-st.subheader("2️⃣ Top 5 Cities, Warehouses & Brands")
+st.subheader(" 2 Top 5 Cities, Warehouses & Brands")
 
 top_cities = filtered_df.groupby("CITY")["AMOUNT"].sum().nlargest(5).reset_index()
 top_warehouses = filtered_df.groupby("WAREHOUSE")["AMOUNT"].sum().nlargest(5).reset_index()
@@ -102,7 +102,7 @@ col3.bar_chart(top_brands.set_index("BRAND"))
 # ---------------------------
 # Step 3: Sales Heatmap (Day vs Month)
 # ---------------------------
-st.subheader("3️⃣ Sales Heatmap (Day vs Month)")
+st.subheader("3️ Sales Heatmap (Day vs Month)")
 
 heatmap_data = filtered_df.copy()
 heatmap_data["Day"] = heatmap_data["ORDER_DATE"].dt.day
@@ -124,7 +124,7 @@ st.plotly_chart(fig_heatmap, use_container_width=True)
 # ---------------------------
 # Step 4: Forecast Overlay (Prophet)
 # ---------------------------
-st.subheader("4️⃣ Sales Forecast Overlay")
+st.subheader("4️ Sales Forecast Overlay")
 
 forecast_days = st.slider("Select Forecast Days", min_value=7, max_value=90, value=30, step=1)
 
