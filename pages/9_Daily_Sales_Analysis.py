@@ -1,161 +1,63 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 
 st.set_page_config(page_title="Daily Sales Analysis", layout="wide")
-st.title("Daily Sales Analysis")
-# ---------------------------------------
-# Load data from session
-# ---------------------------------------
-if "df" not in st.session_state:
-    st.warning(" Please upload dataset from Upload page")
+st.title("📅 Daily Sales Analysis")
+
+# ---------------------------
+# Load data safely
+# ---------------------------
+if "data" not in st.session_state or st.session_state["data"] is None:
+    st.warning("⚠ Please upload data from 'Upload Dataset' page")
     st.stop()
 
-df = st.session_state.df.copy()
+df = st.session_state["data"].copy()
 
-# ---------------------------------------
-# Mandatory Columns Check
-# ---------------------------------------
-required_cols = ["ORDER_DATE", "AMOUNT"]
+# ---------------------------
+# Required columns check
+# ---------------------------
+required_cols = ["ORDER_DATE", "AMOUNT", "TOTAL_QUANTITY"]
 missing = [c for c in required_cols if c not in df.columns]
 
 if missing:
-    st.error(f" Missing required columns: {missing}")
+    st.error(f"❌ Missing required columns: {missing}")
     st.stop()
 
-# ---------------------------------------
-# Data Preparation
-# ---------------------------------------
+# ---------------------------
+# Data preparation
+# ---------------------------
 df["ORDER_DATE"] = pd.to_datetime(df["ORDER_DATE"], errors="coerce")
 df = df.dropna(subset=["ORDER_DATE"])
 
-df["DATE"] = df["ORDER_DATE"].dt.date
-
 daily_sales = (
-    df.groupby("DATE")["AMOUNT"]
-    .sum()
-    .reset_index()
-    .sort_values("DATE")
+    df.groupby(df["ORDER_DATE"].dt.date)
+      .agg(
+          Total_Sales_Amount=("AMOUNT", "sum"),
+          Total_Quantity=("TOTAL_QUANTITY", "sum"),
+          Total_Orders=("ORDER_ID", "nunique")
+      )
+      .reset_index()
 )
 
-# ---------------------------------------
-# KPI Calculations
-# ---------------------------------------
-today_sales = daily_sales.iloc[-1]["AMOUNT"] if len(daily_sales) >= 1 else 0
-yesterday_sales = daily_sales.iloc[-2]["AMOUNT"] if len(daily_sales) >= 2 else 0
-
-growth_pct = (
-    ((today_sales - yesterday_sales) / yesterday_sales) * 100
-    if yesterday_sales > 0 else 0
-)
-
-avg_daily_sales = daily_sales["AMOUNT"].mean()
-
-best_day = daily_sales.loc[daily_sales["AMOUNT"].idxmax()]
-worst_day = daily_sales.loc[daily_sales["AMOUNT"].idxmin()]
-
-# ---------------------------------------
+# ---------------------------
 # KPI Section
-# ---------------------------------------
-k1, k2, k3, k4, k5, k6 = st.columns(6)
+# ---------------------------
+c1, c2, c3 = st.columns(3)
+c1.metric("💰 Total Sales", f"₹{daily_sales['Total_Sales_Amount'].sum():,.0f}")
+c2.metric("📦 Total Quantity", f"{daily_sales['Total_Quantity'].sum():,.0f}")
+c3.metric("🧾 Total Orders", f"{daily_sales['Total_Orders'].sum():,}")
 
-k1.metric("Today Sales", f"₹ {today_sales:,.0f}")
-k2.metric("Yesterday Sales", f"₹ {yesterday_sales:,.0f}")
-k3.metric("Daily Growth %", f"{growth_pct:.2f}%")
-k4.metric("Avg Daily Sales", f"₹ {avg_daily_sales:,.0f}")
-k5.metric("Best Sales Day", best_day["DATE"])
-k6.metric("Worst Sales Day", worst_day["DATE"])
+# ---------------------------
+# Charts
+# ---------------------------
+st.subheader("📈 Daily Sales Trend")
+st.line_chart(daily_sales.set_index("ORDER_DATE")["Total_Sales_Amount"])
 
-st.divider()
+st.subheader("📊 Daily Order Volume")
+st.bar_chart(daily_sales.set_index("ORDER_DATE")["Total_Orders"])
 
-# ---------------------------------------
-# Daily Sales Trend
-# ---------------------------------------
-fig_trend = px.line(
-    daily_sales,
-    x="DATE",
-    y="AMOUNT",
-    markers=True,
-    title=" Daily Sales Trend"
-)
-st.plotly_chart(fig_trend, use_container_width=True)
-
-# ---------------------------------------
-# Day of Week Performance
-# ---------------------------------------
-daily_sales["DAY"] = pd.to_datetime(daily_sales["DATE"]).dt.day_name()
-
-dow_sales = (
-    daily_sales.groupby("DAY")["AMOUNT"]
-    .mean()
-    .reset_index()
-)
-
-fig_dow = px.bar(
-    dow_sales,
-    x="DAY",
-    y="AMOUNT",
-    title=" Avg Sales by Day of Week"
-)
-st.plotly_chart(fig_dow, use_container_width=True)
-
-# ---------------------------------------
-# City & Brand Contribution
-# ---------------------------------------
-col1, col2 = st.columns(2)
-
-if "CITY" in df.columns:
-    city_sales = (
-        df.groupby("CITY")["AMOUNT"]
-        .sum()
-        .nlargest(10)
-        .reset_index()
-    )
-
-    fig_city = px.bar(
-        city_sales,
-        x="CITY",
-        y="AMOUNT",
-        title="Top 10 Cities by Daily Sales"
-    )
-    col1.plotly_chart(fig_city, use_container_width=True)
-
-if "BRAND" in df.columns:
-    brand_sales = (
-        df.groupby("BRAND")["AMOUNT"]
-        .sum()
-        .nlargest(10)
-        .reset_index()
-    )
-
-    fig_brand = px.bar(
-        brand_sales,
-        x="BRAND",
-        y="AMOUNT",
-        title=" Top 10 Brands by Daily Sales"
-    )
-    col2.plotly_chart(fig_brand, use_container_width=True)
-
-# ---------------------------------------
-# Quantity Trend (Optional)
-# ---------------------------------------
-if "TOTAL_QUANTITY" in df.columns:
-    qty_daily = (
-        df.groupby("DATE")["TOTAL_QUANTITY"]
-        .sum()
-        .reset_index()
-    )
-
-    fig_qty = px.line(
-        qty_daily,
-        x="DATE",
-        y="TOTAL_QUANTITY",
-        title=" Daily Quantity Trend"
-    )
-    st.plotly_chart(fig_qty, use_container_width=True)
-
-# ---------------------------------------
+# ---------------------------
 # Data Table
-# ---------------------------------------
-with st.expander("📋 View Daily Sales Data"):
-    st.dataframe(daily_sales, use_container_width=True)
+# ---------------------------
+st.subheader("📋 Daily Sales Table")
+st.dataframe(daily_sales, use_container_width=True)
