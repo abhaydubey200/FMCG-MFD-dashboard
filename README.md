@@ -1,31 +1,55 @@
----
+Below is a **complete, production-ready GitHub README** for your project, written professionally for recruiters, managers, and real FMCG stakeholders.
 
-# 📊 FMCG / MFD Analytics Dashboard (Production-Grade)
-
-A **company-level, production-ready FMCG / MFD analytics dashboard** built using **Python, Streamlit, Pandas, and Plotly**.
-
-This application automatically adapts to **any FMCG/MFD dataset**, detects columns intelligently, and provides **CXO to Operations-level insights** through multiple interactive dashboards.
+You can **copy-paste this directly into `README.md`**.
 
 ---
 
-## 🚀 Key Highlights
+# 📊 FMCG MFD Sales Intelligence Dashboard
 
-* ✅ Upload dataset **once**, use across **all dashboards**
-* ✅ Works with **any FMCG / MFD data structure**
-* ✅ No API key required (fully offline analytics)
-* ✅ Automatic column detection
-* ✅ Modular, scalable, production-ready architecture
-* ✅ Streamlit Cloud deployable
-* ✅ Enterprise-style dashboard segmentation
+A **production-grade, multi-dashboard analytics platform** built using **Streamlit + Python**, designed for **FMCG / Distribution / Retail businesses** to analyze **sales, orders, outlets, SKUs, field force performance, and future demand** — all from **any FMCG dataset**.
 
 ---
 
-## 🧠 Dashboard-Wise Breakdown
+## 🚀 Project Overview
 
-### 1️⃣ Executive Overview (CXO Dashboard)
+This project transforms raw FMCG order data into **actionable business intelligence dashboards** used by:
 
-**Audience:** CEO, Business Head
-**Focus:** Overall business health
+* CXOs & Business Heads
+* Sales & Regional Managers
+* Category & Brand Managers
+* Operations & Supply Chain Teams
+* Strategy & Planning Teams
+
+The system is **dataset-agnostic**, meaning you can upload **any FMCG CSV or Excel file** and the dashboards will adapt automatically.
+
+---
+
+## 🎯 Key Features
+
+✅ One-time dataset upload (shared across all pages)
+✅ Automatic column detection & validation
+✅ Production-safe error handling
+✅ Business-ready KPIs & insights
+✅ Forecasting without API keys
+✅ Scalable, modular architecture
+
+---
+
+## 🧱 Dashboard Architecture (Pages)
+
+### 0️⃣ Upload Dataset
+
+**Single common uploader for entire app**
+
+* Supports CSV / Excel
+* Cleans & stores dataset in session
+* Prevents repeated uploads
+
+---
+
+### 1️⃣ Executive Overview Dashboard (CXO View)
+
+**Focus: How is the business doing overall?**
 
 **KPIs**
 
@@ -33,140 +57,139 @@ This application automatically adapts to **any FMCG/MFD dataset**, detects colum
 * Total Orders
 * Active Outlets
 * Average Order Value
-* Total Quantity
-* Top State / City
+* Sales Growth %
 
 **Visuals**
 
 * KPI cards
-* Sales trend line
-* Top regions bar chart
-* Brand contribution
+* Sales trend
+* Top brands / states
+* Contribution analysis
 
 ---
 
 ### 2️⃣ Sales Performance Dashboard
 
-**Audience:** Sales Head, Regional Managers
+**Audience: Sales Head, Regional Managers**
 
-**KPIs**
+**Analysis**
 
-* Sales by State / City
-* Orders Count
-* Month-on-Month Sales
-* Order Source
-
-**Visuals**
-
-* Monthly trend charts
-* Regional performance bars
-* Drill-down tables
+* Sales by State / City / Area
+* Order volume trends
+* MoM growth
+* Order source distribution
 
 ---
 
 ### 3️⃣ Product / SKU / Brand Dashboard
 
-**Audience:** Category & Marketing Teams
+**Audience: Category & Marketing Teams**
 
-**KPIs**
+**Insights**
 
-* Top & Bottom SKUs
-* Brand Contribution %
-* Category-wise Sales
-* Average Selling Price
-
-**Visuals**
-
-* Top SKUs bar chart
-* Brand share pie
-* Category distribution
+* Top & bottom SKUs
+* Brand contribution %
+* Category-wise sales
+* Avg selling price
 
 ---
 
 ### 4️⃣ Outlet & Distribution Dashboard
 
-**Audience:** Distribution Managers
+**Audience: Distribution Managers**
 
-**KPIs**
+**Metrics**
 
-* Active vs Inactive Outlets
-* Outlet Coverage
-* Verified vs Non-Verified Outlets
-
-**Visuals**
-
-* Outlet distribution charts
-* Coverage analysis
+* Active vs inactive outlets
+* Outlet category sales
+* Verified vs non-verified contribution
+* Coverage insights
 
 ---
 
 ### 5️⃣ Field Force Productivity Dashboard
 
-**Audience:** ASM, RSM, Sales Ops
+**Audience: ASM / RSM / Sales Ops**
 
 **KPIs**
 
-* Sales per Sales Rep
-* Orders per Rep
-* Average Time at Outlet
-* Performance ranking
-
-**Visuals**
-
-* Rep ranking tables
-* Productivity charts
+* Sales per sales rep
+* Orders per rep
+* Time spent at outlets
+* Manager-wise performance
 
 ---
 
 ### 6️⃣ Order & Operations Dashboard
 
-**Audience:** Operations / Supply Chain
+**Audience: Operations / Supply Chain**
 
-**KPIs**
+**Analysis**
 
-* Order Acceptance Rate
-* Rejected Orders %
-* Order Status Distribution
-* Order Type Performance
-
-**Visuals**
-
-* Order state pie chart
-* Funnel-style summaries
-* Rejection analysis
+* Order state funnel
+* Accepted vs rejected orders
+* Order type performance
+* Time-of-day analysis
 
 ---
 
 ### 7️⃣ Sales Forecasting Dashboard
 
-**Audience:** Sales & Strategy Teams
+**Future planning without external APIs**
 
-**Features**
-
-* Time-series aggregation
-* Trend-based forecasting
-* Historical vs forecast comparison
-
-**Visuals**
-
-* Forecast line charts
-* Monthly aggregation
+* Monthly sales forecasting
+* Random Forest based model
+* Trend visualization
+* Business-ready forecast table
 
 ---
 
 ### 8️⃣ Outlet Segmentation Dashboard
 
-**Audience:** Strategy & Distribution Teams
+**Data-driven outlet strategy**
 
-**Features**
-
-* Outlet segmentation using clustering
-* High / Medium / Low value outlets
-* Data-driven grouping
+* Outlet clustering
+* High / medium / low value segmentation
+* Targeted distribution planning
 
 ---
 
-## 🗂️ Project Structure
+### 9️⃣ Daily Sales Analysis
+
+**Granular time intelligence**
+
+* Daily sales trends
+* Day-wise contribution
+* Peak & low sales days
+* Operational planning support
+
+---
+
+### 🔟 Actionable Insights Dashboard
+
+**Advanced decision-making layer**
+
+Includes:
+
+* 📈 KPI cards with traffic-light logic
+* 🔥 Sales heatmaps (Day × Month)
+* 📊 Growth trends (WoW / MoM)
+* 🔮 Forecast overlay (Actual vs Predicted)
+
+---
+
+### 🔮 12️⃣ Future Sales Prediction (Next 12 Months)
+
+**Strategic forecasting for planning & budgeting**
+
+* Random Forest forecasting model
+* Next 12 months prediction
+* Peak demand identification
+* Inventory & revenue planning support
+
+---
+
+## 🗂️ Folder Structure
 
 ```
 fmcg-mfd-dashboard/
@@ -174,6 +197,7 @@ fmcg-mfd-dashboard/
 ├── app.py
 ├── config.py
 ├── requirements.txt
+├── README.md
 │
 ├── pages/
 │   ├── 0_Upload_Dataset.py
@@ -185,103 +209,82 @@ fmcg-mfd-dashboard/
 │   ├── 6_Order_Operations.py
 │   ├── 7_Sales_Forecasting.py
 │   ├── 8_Outlet_Segmentation.py
+│   ├── 9_Daily_Sales_Analysis.py
+│   ├── 11_Actionable_Insights.py
+│   └── 12_Future_Sales_Prediction.py
 │
 ├── utils/
-│   ├── column_detector.py
+│   ├── __init__.py
 │   ├── data_loader.py
+│   ├── column_detector.py
 │   ├── data_processing.py
 │   ├── metrics.py
 │   ├── visualizations.py
 │   ├── forecasting.py
 │   ├── segmentation.py
+│   ├── warehouse_metrics.py
+│   ├── pricing_metrics.py
 │   └── churn_analysis.py
 ```
 
 ---
 
-## 🧪 Supported Data
+## 🧪 Supported Data Columns (Example)
 
-The app **automatically detects columns**, but works best with datasets containing fields like:
+This project works with datasets similar to:
 
-* Order Date
-* Order ID
-* Outlet / Customer
-* SKU / Brand / Category
-* Quantity
-* Amount / Sales Value
-* Region / City / State
-* Salesperson / User
+* ORDER_DATE, ORDER_ID, ORDERSTATE
+* CITY, STATE, WAREHOUSE
+* SKU_ID, BRAND, CATEGORY
+* TOTAL_QUANTITY, AMOUNT
+* DISCOUNT_AMOUNT, UNITPRICE
+* OUTLET_ID, VERIFIED_OUTLET
+* USER_ID, EMPLOYEE_ID
 
-👉 Exact column names **are NOT mandatory**
+👉 Column names are **auto-detected** — strict naming is **not required**.
 
 ---
 
-## ⚙️ Installation & Run
+## 🛠️ Tech Stack
 
-### 1️⃣ Clone Repository
+* **Python 3.9+**
+* **Streamlit**
+* **Pandas / NumPy**
+* **Plotly**
+* **Scikit-learn**
+* **Random Forest (Forecasting)**
+
+❌ No API keys required
+❌ No external AI dependency
+
+---
+
+## ▶️ How to Run Locally
 
 ```bash
+# 1. Clone repository
 git clone https://github.com/your-username/fmcg-mfd-dashboard.git
-cd fmcg-mfd-dashboard
-```
 
-### 2️⃣ Install Dependencies
-
-```bash
+# 2. Install dependencies
 pip install -r requirements.txt
-```
 
-### 3️⃣ Run App
-
-```bash
+# 3. Run app
 streamlit run app.py
 ```
 
 ---
 
-## ☁️ Deployment (Streamlit Cloud)
+## 🧠 Business Value
 
-* Main file: `app.py`
-* Python version: **3.9+**
-* No secrets / API keys required
-
----
-
-## 🎯 Use Cases
-
-* FMCG Companies
-* MFD / Distribution Businesses
-* Sales Analytics Teams
-* CXO Dashboards
-* Interview / Portfolio Project
-* Startup MVP Analytics
-
----
-
-## 🔮 Future Enhancements (Optional)
-
-* Role-based access (CXO / Sales / Ops)
-* PDF / Excel export
-* Alert-based KPIs
-* AI-powered insights (optional toggle)
-* Data validation rules engine
-
----
-
-## 🏆 Why This Project Stands Out
-
-✔ Enterprise dashboard design
-✔ No hardcoded schema
-✔ Modular & scalable
-✔ Real-world FMCG use case
-✔ Interview & production ready
-
----
+✔ Improves sales visibility
+✔ Enables demand planning
+✔ Identifies high-value outlets & SKUs
+✔ Supports data-driven decisions
+✔ Ready for enterprise deployment
 
 ## 👤 Author
 
 **Abhay Dubey**
-Full Stack / Data Analytics Developer
-Focused on **real-world, production-grade systems**
+Data Analytics Engineer
 
 ---
