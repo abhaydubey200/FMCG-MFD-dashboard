@@ -4,7 +4,6 @@ import plotly.express as px
 
 st.set_page_config(page_title="Daily Sales Analysis", layout="wide")
 st.title("Daily Sales Analysis")
-
 # ---------------------------------------
 # Load data from session
 # ---------------------------------------
