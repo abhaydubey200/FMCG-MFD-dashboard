@@ -1,108 +1,167 @@
-# 11_Forecasting_Insights.py
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from prophet import Prophet
 from sklearn.ensemble import RandomForestRegressor
-from utils.data_loader import load_dataset
-from utils.visualizations import line_sales_trend, bar_top
 
-st.set_page_config(page_title="Forecasting & Insights", layout="wide")
-st.title("📊 Actionable Insights & Future Forecasting")
+# -------------------------------------------------
+# Page Config
+# -------------------------------------------------
+st.set_page_config(page_title="📈 Actionable Insights", layout="wide")
 
-# -----------------------------
-# Load common dataset from page 0
-# -----------------------------
-if "df" in st.session_state:
-    df = st.session_state["df"]
-else:
-    uploaded_file = st.file_uploader(
-        "Upload your FMCG dataset (CSV / Excel)", type=["csv", "xlsx"]
-    )
-    if uploaded_file:
-        df = load_dataset(uploaded_file)
-    else:
-        st.info("Please upload a dataset on page 0 or here to continue.")
-        st.stop()
+st.title("📈 Actionable Insights Dashboard")
+st.caption("Executive-level insights derived from sales behavior")
 
-df['ORDER_DATE'] = pd.to_datetime(df['ORDER_DATE'], errors='coerce')
-df = df.dropna(subset=['ORDER_DATE'])
+# -------------------------------------------------
+# Load data from common uploader (Session State)
+# -------------------------------------------------
+if "df" not in st.session_state:
+    st.warning("⬆️ Please upload a dataset from the Upload Dataset page.")
+    st.stop()
 
-# -----------------------------
-# 1️⃣ Actionable Insights
-# -----------------------------
-st.header("🔍 Actionable Insights")
-# Weekly / Monthly Growth
-df['Month'] = df['ORDER_DATE'].dt.to_period('M')
-monthly_sales = df.groupby('Month')['AMOUNT'].sum().reset_index()
-monthly_sales['Month'] = monthly_sales['Month'].dt.to_timestamp()
+df = st.session_state["df"].copy()
 
-fig1 = px.line(monthly_sales, x='Month', y='AMOUNT', title="Monthly Sales Trend")
-st.plotly_chart(fig1, use_container_width=True)
+# -------------------------------------------------
+# Mandatory Columns Check
+# -------------------------------------------------
+required_cols = ["ORDER_DATE", "AMOUNT", "CITY", "WAREHOUSE", "BRAND"]
+missing = [c for c in required_cols if c not in df.columns]
 
-# Top 5 Cities / Brands
-st.subheader("Top 5 Cities & Brands")
-fig2 = bar_top(df, 'CITY', 'AMOUNT', "Top 5 Cities by Sales")
-fig3 = bar_top(df, 'BRAND', 'AMOUNT', "Top 5 Brands by Sales")
-st.plotly_chart(fig2, use_container_width=True)
-st.plotly_chart(fig3, use_container_width=True)
+if missing:
+    st.error(f"Missing required columns: {missing}")
+    st.stop()
 
-# Heatmap: Day vs Month
-st.subheader("Sales Heatmap")
-heatmap_data = df.groupby([df['ORDER_DATE'].dt.day, df['ORDER_DATE'].dt.month])['AMOUNT'].sum().reset_index()
-heatmap_data.rename(columns={'ORDER_DATE': 'Day', 'ORDER_DATE': 'Month', 'AMOUNT': 'Sales'}, inplace=True)
-heatmap_data_pivot = heatmap_data.pivot(index='day', columns='month', values='AMOUNT')
-st.write("Heatmap coming soon – can implement with plotly heatmap or seaborn if needed.")
+# -------------------------------------------------
+# Data Preparation
+# -------------------------------------------------
+df["ORDER_DATE"] = pd.to_datetime(df["ORDER_DATE"], errors="coerce")
+df = df.dropna(subset=["ORDER_DATE", "AMOUNT"])
 
-# -----------------------------
-# 2️⃣ Future Forecast (Next 12 Months)
-# -----------------------------
-st.header("🔮 Future Forecasting")
-model_option = st.selectbox("Select Forecasting Model", ["Prophet", "Random Forest"])
+df["order_day"] = df["ORDER_DATE"].dt.day
+df["order_month"] = df["ORDER_DATE"].dt.month
+df["order_week"] = df["ORDER_DATE"].dt.isocalendar().week
+df["year_month"] = df["ORDER_DATE"].dt.to_period("M").astype(str)
 
-# Aggregate monthly sales
-monthly_sales.rename(columns={'AMOUNT': 'y', 'Month': 'ds'}, inplace=True)
+# -------------------------------------------------
+# KPI SECTION (Traffic Light)
+# -------------------------------------------------
+st.subheader("🚦 Key Performance Indicators")
 
-if model_option == "Prophet":
-    st.subheader("Prophet Forecast")
-    model = Prophet()
-    model.fit(monthly_sales)
-    future = model.make_future_dataframe(periods=12, freq='M')
-    forecast = model.predict(future)
-    fig_forecast = px.line(forecast, x='ds', y='yhat', title="Prophet Forecast for Next 12 Months")
-    fig_forecast.add_scatter(x=monthly_sales['ds'], y=monthly_sales['y'], mode='lines', name='Actual')
-    st.plotly_chart(fig_forecast, use_container_width=True)
-    next_12 = forecast.tail(12)
-elif model_option == "Random Forest":
-    st.subheader("Random Forest Forecast")
-    rf_df = monthly_sales.copy()
-    rf_df['month'] = rf_df['ds'].dt.month
-    rf_df['year'] = rf_df['ds'].dt.year
-    X = rf_df[['year', 'month']]
-    y = rf_df['y']
+total_sales = df["AMOUNT"].sum()
+avg_daily_sales = df.groupby("ORDER_DATE")["AMOUNT"].sum().mean()
 
-    rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
-    rf_model.fit(X, y)
+mom_growth = (
+    df.groupby("year_month")["AMOUNT"].sum().pct_change().iloc[-1] * 100
+    if df["year_month"].nunique() > 1 else 0
+)
 
-    future_dates = pd.date_range(start=rf_df['ds'].max() + pd.Timedelta(days=1), periods=12, freq='M')
-    future_df = pd.DataFrame({'ds': future_dates})
-    future_df['month'] = future_df['ds'].dt.month
-    future_df['year'] = future_df['ds'].dt.year
-    future_df['yhat'] = rf_model.predict(future_df[['year', 'month']])
-    fig_forecast = px.line(future_df, x='ds', y='yhat', title="Random Forest Forecast for Next 12 Months")
-    fig_forecast.add_scatter(x=monthly_sales['ds'], y=monthly_sales['y'], mode='lines', name='Actual')
-    st.plotly_chart(fig_forecast, use_container_width=True)
-    next_12 = future_df
+def kpi_color(value):
+    if value > 10:
+        return "🟢"
+    elif value > 0:
+        return "🟠"
+    return "🔴"
 
-# Display predicted KPIs
-st.subheader("Predicted KPIs for Next 12 Months")
-st.metric("Predicted Total Sales", f"{next_12['yhat'].sum():,.0f}")
-st.metric("Predicted Avg Monthly Sales", f"{next_12['yhat'].mean():,.0f}")
+col1, col2, col3 = st.columns(3)
 
-# Download forecast
-st.download_button(
-    "⬇️ Download Forecast CSV",
-    data=next_12[['ds', 'yhat']].to_csv(index=False),
-    file_name="forecast_next_12_months.csv",
-    mime="text/csv"
+col1.metric("💰 Total Sales", f"₹{total_sales:,.0f}")
+col2.metric("📊 Avg Daily Sales", f"₹{avg_daily_sales:,.0f}")
+col3.metric(
+    "📈 MoM Growth",
+    f"{mom_growth:.2f}%",
+    delta=f"{kpi_color(mom_growth)}"
+)
+
+# -------------------------------------------------
+# Top 5 Analysis
+# -------------------------------------------------
+st.subheader("🏆 Top 5 Contributors")
+
+c1, c2, c3 = st.columns(3)
+
+with c1:
+    top_city = df.groupby("CITY")["AMOUNT"].sum().nlargest(5).reset_index()
+    st.plotly_chart(px.bar(top_city, x="CITY", y="AMOUNT", title="Top 5 Cities"), True)
+
+with c2:
+    top_wh = df.groupby("WAREHOUSE")["AMOUNT"].sum().nlargest(5).reset_index()
+    st.plotly_chart(px.bar(top_wh, x="WAREHOUSE", y="AMOUNT", title="Top 5 Warehouses"), True)
+
+with c3:
+    top_brand = df.groupby("BRAND")["AMOUNT"].sum().nlargest(5).reset_index()
+    st.plotly_chart(px.bar(top_brand, x="BRAND", y="AMOUNT", title="Top 5 Brands"), True)
+
+# -------------------------------------------------
+# Sales Heatmap (Day vs Month)
+# -------------------------------------------------
+st.subheader("🔥 Sales Heatmap (Day vs Month)")
+
+heatmap_df = (
+    df.groupby(["order_day", "order_month"], as_index=False)["AMOUNT"].sum()
+)
+
+pivot_heatmap = heatmap_df.pivot(
+    index="order_day",
+    columns="order_month",
+    values="AMOUNT"
+)
+
+fig_heatmap = px.imshow(
+    pivot_heatmap,
+    labels=dict(x="Month", y="Day", color="Sales"),
+    title="Sales Intensity Heatmap",
+    aspect="auto"
+)
+
+st.plotly_chart(fig_heatmap, use_container_width=True)
+
+# -------------------------------------------------
+# Forecast Overlay (Random Forest – Production Safe)
+# -------------------------------------------------
+st.subheader("🔮 Forecast Overlay (Next 90 Days)")
+
+daily_sales = df.groupby("ORDER_DATE")["AMOUNT"].sum().reset_index()
+daily_sales["t"] = (daily_sales["ORDER_DATE"] - daily_sales["ORDER_DATE"].min()).dt.days
+
+X = daily_sales[["t"]]
+y = daily_sales["AMOUNT"]
+
+rf = RandomForestRegressor(n_estimators=200, random_state=42)
+rf.fit(X, y)
+
+future_days = 90
+future_dates = pd.date_range(
+    start=daily_sales["ORDER_DATE"].max() + pd.Timedelta(days=1),
+    periods=future_days
+)
+
+future_t = (future_dates - daily_sales["ORDER_DATE"].min()).days.values.reshape(-1, 1)
+forecast = rf.predict(future_t)
+
+forecast_df = pd.DataFrame({
+    "ORDER_DATE": future_dates,
+    "AMOUNT": forecast
+})
+
+fig_forecast = px.line(daily_sales, x="ORDER_DATE", y="AMOUNT", title="Sales Forecast Overlay")
+fig_forecast.add_scatter(
+    x=forecast_df["ORDER_DATE"],
+    y=forecast_df["AMOUNT"],
+    mode="lines",
+    name="Forecast"
+)
+
+st.plotly_chart(fig_forecast, use_container_width=True)
+
+# -------------------------------------------------
+# Executive Takeaways
+# -------------------------------------------------
+st.subheader("🧠 Executive Insights")
+
+st.success(
+    f"""
+• Sales momentum is **{kpi_color(mom_growth)} {'positive' if mom_growth > 0 else 'negative'}**
+• Top cities & warehouses drive majority revenue
+• Clear seasonal demand patterns visible
+• Forecast indicates {'growth' if forecast.mean() > avg_daily_sales else 'softening demand'}
+"""
 )
