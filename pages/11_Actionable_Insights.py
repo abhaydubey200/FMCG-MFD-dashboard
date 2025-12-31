@@ -11,7 +11,7 @@ from datetime import datetime
 
 st.set_page_config(page_title="Actionable Insights", layout="wide")
 
-st.title("📈 Actionable Insights Dashboard")
+st.title(" Actionable Insights Dashboard")
 
 # -----------------------------
 # Use common dataset from page 0
@@ -43,24 +43,24 @@ total_quantity = df['TOTAL_QUANTITY'].sum()
 avg_order_value = total_sales / total_orders
 
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("💰 Total Sales", f"{total_sales:,.0f}")
-col2.metric("🛒 Total Orders", f"{total_orders:,}")
-col3.metric("📦 Total Quantity", f"{total_quantity:,.0f}")
-col4.metric("💵 Avg Order Value", f"{avg_order_value:,.2f}")
+col1.metric(" Total Sales", f"{total_sales:,.0f}")
+col2.metric(" Total Orders", f"{total_orders:,}")
+col3.metric(" Total Quantity", f"{total_quantity:,.0f}")
+col4.metric(" Avg Order Value", f"{avg_order_value:,.2f}")
 
 st.markdown("---")
 
 # -----------------------------
 # Sales Trend Line
 # -----------------------------
-st.subheader("📊 Sales Trend Over Time")
+st.subheader(" Sales Trend Over Time")
 fig_trend = line_sales_trend(df, 'ORDER_DATE', 'AMOUNT')
 st.plotly_chart(fig_trend, use_container_width=True)
 
 # -----------------------------
 # Top 5 Cities / Warehouses / Brands
 # -----------------------------
-st.subheader("🏆 Top 5 Cities / Warehouses / Brands")
+st.subheader(" Top 5 Cities / Warehouses / Brands")
 
 col1, col2, col3 = st.columns(3)
 
@@ -78,7 +78,7 @@ st.markdown("---")
 # -----------------------------
 # Heatmap: Day vs Month
 # -----------------------------
-st.subheader("📅 Sales Heatmap (Day vs Month)")
+st.subheader(" Sales Heatmap (Day vs Month)")
 df['day'] = df['ORDER_DATE'].dt.day
 df['month'] = df['ORDER_DATE'].dt.month
 heatmap_data = df.groupby(['day', 'month'])['AMOUNT'].sum().reset_index()
